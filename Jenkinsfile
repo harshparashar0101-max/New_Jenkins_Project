@@ -41,35 +41,25 @@ pipeline {
         }
 
         stage('Authenticate to Xray') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'XRAY_CLIENT_ID', variable: 'XRAY_CLIENT_ID'),
-                    string(credentialsId: 'XRAY_CLIENT_SECRET', variable: 'XRAY_CLIENT_SECRET')
-                ]) {
-                    bat '''
-                    powershell -Command ^
-                    "$body = @{ client_id='%XRAY_CLIENT_ID%'; client_secret='%XRAY_CLIENT_SECRET%' } | ConvertTo-Json -Compress; ^
-                    $token = Invoke-RestMethod -Method Post -Uri '%XRAY_BASE_URL%/api/v2/authenticate' -ContentType 'application/json' -Body $body; ^
-                    Set-Content -Path xray_token.txt -Value $token"
-                    '''
-                }
-            }
+    steps {
+        withCredentials([
+            string(credentialsId: 'XRAY_CLIENT_ID', variable: 'XRAY_CLIENT_ID'),
+            string(credentialsId: 'XRAY_CLIENT_SECRET', variable: 'XRAY_CLIENT_SECRET')
+        ]) {
+            bat '''
+            powershell -Command "$body = @{client_id='%XRAY_CLIENT_ID%'; client_secret='%XRAY_CLIENT_SECRET%'} | ConvertTo-Json; $token = Invoke-RestMethod -Method Post -Uri 'https://xray.cloud.getxray.app/api/v2/authenticate' -ContentType 'application/json' -Body $body; Set-Content -Path xray_token.txt -Value $token"
+            '''
         }
+    }
+}
 
-        stage('Import Results to Xray') {
-            steps {
-                bat '''
-                powershell -Command ^
-                "$token = Get-Content xray_token.txt -Raw; ^
-                $token = $token.Trim('\\"'); ^
-                Invoke-RestMethod -Method Post ^
-                  -Uri '%XRAY_BASE_URL%/api/v2/import/execution/junit?projectKey=%PROJECT_KEY%' ^
-                  -Headers @{ Authorization = 'Bearer ' + $token } ^
-                  -ContentType 'text/xml' ^
-                  -InFile 'reports/results.xml'"
-                '''
-            }
-        }
+       stage('Import Results to Xray') {
+    steps {
+        bat '''
+        powershell -Command "$token = Get-Content xray_token.txt; $token = $token.Trim('\"'); Invoke-RestMethod -Method Post -Uri 'https://xray.cloud.getxray.app/api/v2/import/execution/junit?projectKey=LOGI' -Headers @{Authorization = 'Bearer ' + $token} -ContentType 'text/xml' -InFile 'reports/results.xml'"
+        '''
+    }
+}
     }
 
     post {
