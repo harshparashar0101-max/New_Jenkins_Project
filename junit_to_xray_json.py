@@ -37,16 +37,16 @@ def parse_junit():
             time_taken = case.attrib.get("time", "0")
 
             if case.find("failure") is not None:
-                status = "FAIL"
+                status = "FAILED"
                 comment = case.find("failure").attrib.get("message", "Test failed")
             elif case.find("error") is not None:
-                status = "FAIL"
+                status = "FAILED"
                 comment = case.find("error").attrib.get("message", "Test errored")
             elif case.find("skipped") is not None:
                 status = "TODO"
                 comment = "Test skipped"
             else:
-                status = "PASS"
+                status = "PASSED"
                 comment = "Automated execution from Jenkins"
 
             testcases.append(
@@ -85,6 +85,7 @@ def build_xray_json(testcases, mapping):
         )
 
     result = {
+         "testExecutionKey": "LOGI-70",
         "info": {
             "summary": "Jenkins automated execution",
             "description": "Execution imported from Jenkins using Xray JSON",
