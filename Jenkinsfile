@@ -8,17 +8,26 @@ pipeline {
             }
         }
 
+        stage('Check Python') {
+            steps {
+                bat 'where python'
+                bat 'where py'
+                bat 'python --version'
+                bat 'py --version'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                bat 'python -m pip install --upgrade pip'
-                bat 'python -m pip install -r requirements.txt'
+                bat 'py -m pip install --upgrade pip'
+                bat 'py -m pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
                 bat 'if not exist reports mkdir reports'
-                bat 'python -m pytest --junitxml=reports/results.xml'
+                bat 'py -m pytest --junitxml=reports/results.xml'
             }
         }
 
