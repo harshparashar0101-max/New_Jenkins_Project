@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PYTHON_EXE = 'C:\\Users\\ADMIN\\AppData\\Local\\Python\\bin\\python.exe'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,24 +14,21 @@ pipeline {
 
         stage('Check Python') {
             steps {
-                bat 'where python'
-                bat 'where py'
-                bat 'python --version'
-                bat 'py --version'
+                bat '"%PYTHON_EXE%" --version'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'py -m pip install --upgrade pip'
-                bat 'py -m pip install -r requirements.txt'
+                bat '"%PYTHON_EXE%" -m pip install --upgrade pip'
+                bat '"%PYTHON_EXE%" -m pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
                 bat 'if not exist reports mkdir reports'
-                bat 'py -m pytest --junitxml=reports/results.xml'
+                bat '"%PYTHON_EXE%" -m pytest --junitxml=reports/results.xml'
             }
         }
 
