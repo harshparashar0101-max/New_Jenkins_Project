@@ -11,14 +11,14 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 bat 'python -m pip install --upgrade pip'
-                bat 'pip install -r requirements.txt'
+                bat 'python -m pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
                 bat 'if not exist reports mkdir reports'
-                bat 'pytest --junitxml=reports/results.xml'
+                bat 'python -m pytest --junitxml=reports/results.xml'
             }
         }
 
