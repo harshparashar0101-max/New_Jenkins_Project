@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_EXE = 'C:\\Users\\ADMIN\\AppData\\Local\\Python\\bin\\python.exe'
+        PYTHON_EXE    = 'C:\\Users\\ADMIN\\AppData\\Local\\Python\\bin\\python.exe'
+        XRAY_BASE_URL = 'https://xray.cloud.getxray.app'
+        PROJECT_KEY   = 'LOGI'
     }
 
     stages {
@@ -35,6 +37,37 @@ pipeline {
         stage('Publish Test Report in Jenkins') {
             steps {
                 junit 'reports/results.xml'
+            }
+        }
+
+        stage('Authenticate to Xray') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'XRAY_CLIENT_ID', variable: 'XRAY_CLIENT_ID'),
+                    string(credentialsId: 'XRAY_CLIENT_SECRET', variable: 'XRAY_CLIENT_SECRET')
+                ]) {
+                    bat '''
+                    powershell -Command ^
+                    "$body = @{ client_id='%XRAY_CLIENT_ID%'; client_secret='%XRAY_CLIENT_SECRET%' } | ConvertTo-Json -Compress; ^
+                    $token = Invoke-RestMethod -Method Post -Uri '%XRAY_BASE_URL%/api/v2/authenticate' -ContentType 'application/json' -Body $body; ^
+                    Set-Content -Path xray_token.txt -Value $token"
+                    '''
+                }
+            }
+        }
+
+        stage('Import Results to Xray') {
+            steps {
+                bat '''
+                powershell -Command ^
+                "$token = Get-Content xray_token.txt -Raw; ^
+                $token = $token.Trim('\\"'); ^
+                Invoke-RestMethod -Method Post ^
+                  -Uri '%XRAY_BASE_URL%/api/v2/import/execution/junit?projectKey=%PROJECT_KEY%' ^
+                  -Headers @{ Authorization = 'Bearer ' + $token } ^
+                  -ContentType 'text/xml' ^
+                  -InFile 'reports/results.xml'"
+                '''
             }
         }
     }
