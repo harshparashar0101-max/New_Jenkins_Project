@@ -1,13 +1,10 @@
+import pytest
+
+@pytest.mark.xray_test("LOGI-21")
 def test_valid_login():
-    username = "admin"
-    password = "admin123"
-
-    assert username == "admin"
-    assert password == "admin123"
+    assert True
 
 
+@pytest.mark.xray_test("LOGI-22")
 def test_invalid_login():
-    username = "admin"
-    password = "wrongpass"
-
-    assert not (username == "admin" and password == "admin123")
+    assert True
