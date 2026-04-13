@@ -71,5 +71,18 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'reports/results.xml, reports/xray_results.json', fingerprint: true
         }
+
+        post {
+    success {
+        mail to: 'harsh.parashar@lmsin.com',
+             subject: "Jenkins Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+             body: "Build passed successfully."
+    }
+    failure {
+        mail to: 'harsh.parashar@lmsin.com',
+             subject: "Jenkins Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+             body: "Build failed. Please check Jenkins console output."
+    }
+            }
     }
 }
