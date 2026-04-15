@@ -76,7 +76,7 @@ pipeline {
             emailext(
                 to: 'parashar.harsh93@gmail.com',
                 subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build Passed"
+                body: "Build Passed",
                 from: 'harsh.parashar0101@gmail.com'
             )
         }
@@ -85,7 +85,7 @@ pipeline {
             emailext(
                 to: 'parashar.harsh93@gmail.com',
                 subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build Failed"
+                body: "Build Failed",
                 from: 'harsh.parashar0101@gmail.com'
             )
         }
