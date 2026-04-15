@@ -75,8 +75,15 @@ pipeline {
         success {
             emailext(
                 to: 'parashar.harsh93@gmail.com',
-                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build Passed",
+                subject: "[JENKINS] SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """Build Status: SUCCESS
+
+Job Name: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+
+The Jenkins build completed successfully.
+Xray execution was updated successfully.
+""",
                 replyTo: 'harsh.parashar0101@gmail.com'
             )
         }
@@ -84,8 +91,15 @@ pipeline {
         failure {
             emailext(
                 to: 'parashar.harsh93@gmail.com',
-                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build Failed",
+                subject: "[JENKINS] FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """Build Status: FAILED
+
+Job Name: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+
+The Jenkins build failed.
+Please check the Jenkins console log for details.
+""",
                 replyTo: 'harsh.parashar0101@gmail.com'
             )
         }
